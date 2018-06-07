@@ -1,0 +1,31 @@
+We have some data files that have various errors. We need a script to cleanup those files. We already have some rules that we found that need implementing. Here the steps, I will give more explanation to each:
+
+// splitrows col: column1 on: '\r\n'
+replace col: column1 with: ' 10 6 ' on: `\) 10^6` global: true
+replace col: column1 with: ' 10 5 ' on: ' 10^5)' global: true
+replace col: column1 with: '10 5' on: '10^5 '
+replace col: column1 with: ' 10 6 ' on: `10^6\) ` global: true
+replace col: column1 with: '10 6)^' on: '10^6)^' global: true
+replace col: column1 with: 'microg\/ml ' on: `microg/ml^ ` global: true
+replace col: column1 with: '40% GRASIME' on: '40%^ GRASIME' global: true
+replace col: column1 with: '6844041' on: '6844041\/1995' global: true
+replace col: column1 with: 'LOW RANGE ' on: `LOW RANGE^ ` global: true
+replace col: column1 with: 'STEAM, 10 6' on: `STEAM, 10^6` global: true
+split col: column1 on: /\^/ limit: 38
+header sourcerownumber: 1
+extract col: AutoritateContractantaCUI on: `{digit}+` limit: 1
+drop col: AutoritateContractantaCUI
+extract col: DataContract on: `{digit}{4}-{digit}{2}-{digit}{2}` limit: 1
+drop col: DataContract
+extract col: DataAnuntParticipare on: `{digit}{4}-{digit}{2}-{digit}{2}` limit: 1
+drop col: DataAnuntParticipare
+settype col: Valoare,ValoareEUR,ValoareRON type: 'Float'
+replace col: ValoareEUR,ValoareRON,Valoare with: ',' on: `.`
+replace col: CastigatorCUI with: '' on: 'CUI' global: true
+set col: AutoritateContractanta value: upper(AutoritateContractanta)
+settype col: CPVCodeID type: 'Integer'
+settype col: NumarContract type: 'String'
+drop col: TipAC, FonduriComunitare, TipFinantare, TipLegislatieID, FondEuropean, ContractPeriodic
+set col: Castigator value: upper($col)
+
+I added a sample file
